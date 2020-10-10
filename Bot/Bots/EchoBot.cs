@@ -34,22 +34,6 @@ namespace Microsoft.BotBuilderSamples.Bots
                     break;
             }
                 await turnContext.SendActivityAsync(reply, cancellationToken);
-=======
-            string replyText;
-            switch (turnContext.Activity.Text)
-            {
-                case "/start": 
-                    replyText = $"Hello and welcome!";
-                    await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);  
-                    break;
-
-                default:
-                    replyText = $"Echo: {turnContext.Activity.Text}";
-                    await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
-                    break;
-
-            }
->>>>>>> 6cff79918f749399cc70013c2bb8f8a124522843
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
