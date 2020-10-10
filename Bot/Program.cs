@@ -32,7 +32,7 @@ namespace Microsoft.BotBuilderSamples
                         var id = reader.GetString(0);
                         var name = reader.GetString(1);
                         var rate = reader.GetString(2);
-                        Console.WriteLine($"Hello, {name} {rate}!");
+                        //Console.WriteLine($"Hello, {name} {rate}!");
                     }
                 }
             }

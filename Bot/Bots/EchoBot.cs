@@ -48,20 +48,22 @@ namespace Microsoft.BotBuilderSamples.Bots
             }*/
 
             //TODO insert new user
+            //System.Console.WriteLine("привет пользователь");
             using (var connection = new SqliteConnection("Data Source=Database.db"))
             {
                 string id = turnContext.Activity.Recipient.Id;
-                string name = turnContext.Activity.Recipient.Name;
+                string nickname = turnContext.Activity.Recipient.Name;
                 connection.Open();
 
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                 INSERT INTO OR IGNORE 'Users'('id', 'name') VALUES (@id, @name)
+                 INSERT OR IGNORE INTO 'Users'('id', 'nickname') VALUES (@id, @nickname)
                  ";
-                command.Parameters.AddWithValue("@image", id);
-                command.Parameters.AddWithValue("@name", name);
-
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@nickname", nickname);
+                command.ExecuteNonQuery();
+                //System.Console.WriteLine("по идее добавили");
             }
 
             var reply = MessageFactory.Text("Доброго времени суток, решите несколько задач для определения уровня сложности");
