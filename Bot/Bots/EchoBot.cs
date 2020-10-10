@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Data.Sqlite;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
@@ -45,6 +46,24 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
                 }
             }*/
+
+            //TODO insert new user
+            using (var connection = new SqliteConnection("Data Source=Database.db"))
+            {
+                string id = turnContext.Activity.Recipient.Id;
+                string name = turnContext.Activity.Recipient.Name;
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                 INSERT INTO OR IGNORE 'Users'('id', 'name') VALUES (@id, @name)
+                 ";
+                command.Parameters.AddWithValue("@image", id);
+                command.Parameters.AddWithValue("@name", name);
+
+            }
+
             var reply = MessageFactory.Text("Доброго времени суток, решите несколько задач для определения уровня сложности");
             //Попросим ввести ник, так будет понятнее смотреть рейтинг
             //тут текст первой задачки со всей херней...
