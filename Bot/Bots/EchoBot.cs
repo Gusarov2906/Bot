@@ -13,11 +13,11 @@ namespace Microsoft.BotBuilderSamples.Bots
     {
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var replyText;
+            string replyText;
             switch (turnContext.Activity.Text)
             {
                 case "/start": 
-                    replyText = $"Hello and welcome!;
+                    replyText = $"Hello and welcome!";
                     await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);  
                     break;
 
