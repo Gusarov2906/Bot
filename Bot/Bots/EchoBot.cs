@@ -13,7 +13,6 @@ namespace Microsoft.BotBuilderSamples.Bots
     {
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-<<<<<<< HEAD
             var reply = MessageFactory.Text("Nothing done?");
            
 

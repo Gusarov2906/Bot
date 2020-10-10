@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EchoBot.Bots
+namespace Module
 {
     public class Equation
     {
@@ -239,12 +239,6 @@ namespace EchoBot.Bots
             return str;
         }
 
-        static void Main(string[] args)
-        {
-            string[] q = SolveEquation(3, 4);
-            foreach (string h in q)
-                Console.WriteLine(h);
-        }
     }
 }
-}
+
