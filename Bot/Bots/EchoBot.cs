@@ -45,7 +45,11 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
                 }
             }*/
-            var reply = MessageFactory.Text("Доброго времени суток, выберите сложность задачи, которую вы хотите решить");
+            var reply = MessageFactory.Text("Доброго времени суток, решите несколько задач для определения уровня сложности");
+            //Попросим ввести ник, так будет понятнее смотреть рейтинг
+            //тут текст первой задачки со всей херней...
+            //потом выводим кнопки с ответами, один правильный
+            //так повторяем еще раз(взависимости от того, сколько мы хотим начальных тестовых задачек)
             reply.SuggestedActions = new SuggestedActions()
             {
                 Actions = new List<CardAction>()
