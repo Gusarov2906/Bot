@@ -19,9 +19,16 @@ namespace Microsoft.BotBuilderSamples.Bots
         public string nickname;
         public int rate;
     }
+
+    public struct TaskStruct
+    {
+        public string text;
+        public string ans;
+    }
     public class EchoBot : ActivityHandler
     {
         public static string ansforEq = "";
+        public static string ansforTs = "";
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             string id = turnContext.Activity.From.Id;
@@ -43,7 +50,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             };
 
             bool flag = true;
-
+            int rate = 0;
             switch (turnContext.Activity.Text)
             {
                 case "/start":
@@ -52,19 +59,30 @@ namespace Microsoft.BotBuilderSamples.Bots
                     reply = MessageFactory.Text(id + "\t" + nickname);
                     break;
                 case "Задание":
-                    string[] equationTask = Equation.SolveEquation(2, 4);
-                    ansforEq = equationTask[1];
-                    reply = MessageFactory.Text(equationTask[0]);
-                    reply.SuggestedActions = new SuggestedActions()
+                    int tempRand = (new Random()).Next() % 2;
+                    rate = getRate(id);
+                    if (tempRand == 0)
                     {
-                        Actions = new List<CardAction>()
+                        string[] equationTask = Equation.SolveEquation(rateToWeight(rate), 4);
+                        ansforEq = equationTask[1];
+                        reply = MessageFactory.Text(equationTask[0] + "\t" + equationTask[1]);
+                        reply.SuggestedActions = new SuggestedActions()
+                        {
+                            Actions = new List<CardAction>()
                         {
                             new CardAction() { Title = equationTask[2], Type = ActionTypes.ImBack, Value = "0"},
                             new CardAction() { Title = equationTask[3], Type = ActionTypes.ImBack, Value = "1" },
                             new CardAction() { Title = equationTask[4], Type = ActionTypes.ImBack, Value = "2" },
                             new CardAction() { Title = equationTask[5], Type = ActionTypes.ImBack, Value = "3" },
                         },
-                    };
+                        };
+                    }
+                    else
+                    {
+                        TaskStruct taskStruct = getTask(rateToWeight(getRate(id)));
+                        ansforTs = taskStruct.ans;
+                        reply = MessageFactory.Text(taskStruct.text + "\t" + ansforTs);                    
+                    }    
 
                     flag = false;
                     break;
@@ -72,17 +90,28 @@ namespace Microsoft.BotBuilderSamples.Bots
                 case "1":
                 case "2":
                 case "3":
-                    if(ansforEq.Equals(turnContext.Activity.Text))
+                    if (ansforEq.Equals(turnContext.Activity.Text))
+                    {
+                        setRate(id, (getRate(id) + 100));
                         reply = MessageFactory.Text("GG");
+                    }
                     else
+                    {
+                        int tempRate = getRate(id);
+                        if (tempRate >= 100)
+                            setRate(id, (getRate(id) - 100));
                         reply = MessageFactory.Text("FF");
+                    }
                     break;
+
+
+
                 case "Факты":
                     string fact = getFact();
                     reply = MessageFactory.Text(fact);
                     break;
                 case "Профиль":
-                    string rate = getRate(id);
+                     rate = getRate(id);
                     reply = MessageFactory.Text("Имя:\t" + nickname +  "\tРейтинг:\t" + rate);
                     break;
 
@@ -98,7 +127,18 @@ namespace Microsoft.BotBuilderSamples.Bots
                     break;
                     
                 default:
-
+                    if ((turnContext.Activity.Text).Equals(ansforTs.ToString()))
+                    {
+                        setRate(id, (getRate(id) + 100));
+                        reply = MessageFactory.Text("GG");
+                    }
+                    else
+                    {
+                        int tempRate = getRate(id);
+                        if (tempRate >= 100)
+                            setRate(id, (getRate(id) - 100));
+                        reply = MessageFactory.Text("FF");
+                    }
                     break;
             }
 
@@ -120,7 +160,13 @@ namespace Microsoft.BotBuilderSamples.Bots
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
        
-
+        protected int rateToWeight(int rate)
+        {
+            if (rate > 1000)
+                return 5;
+            return rate / 200 + 1;
+           
+        }
         protected List<User> getRatingOfUsers()
         {
             List<User> rateArray = new List<User>();
@@ -174,6 +220,38 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
             return fact;
         }
+
+
+        protected TaskStruct getTask(int weight)
+        {
+            List<TaskStruct> taskList = new List<TaskStruct>();
+            TaskStruct taskstruct;
+            using (var connection = new SqliteConnection("Data Source=wwwroot/Database.sqlite"))
+            {              
+               
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                 SELECT * FROM Tasks ORDER BY RANDOM()
+                 ";
+                //command.Parameters.AddWithValue("@weight", weight);
+                //command.ExecuteNonQuery();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        taskstruct.text = reader.GetString(1);
+                        taskstruct.ans = reader.GetString(2);
+                        taskList.Add(taskstruct);
+                        // taskstruct.ans = 0f;
+                    }
+                }
+            }
+            return taskList[0];
+        }
+
         protected void addUser(string id, string nickname)
         {
             using (var connection = new SqliteConnection("Data Source=wwwroot/Database.sqlite"))
@@ -193,9 +271,28 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
         }
 
-        protected string getRate(string id)
+        protected void setRate(string id, int rate)
         {
-            string rate = " ";
+            using (var connection = new SqliteConnection("Data Source=wwwroot/Database.sqlite"))
+            {
+
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                 UPDATE 'Users' SET rate = @rate WHERE id = @id
+                 ";
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@rate", rate);
+                command.ExecuteNonQuery();
+                rate = getRate(id);
+                //System.Console.WriteLine("по идее добавили");
+            }
+        }
+        protected int getRate(string id)
+        {
+            int rate = 0;
             using (var connection = new SqliteConnection("Data Source=wwwroot/Database.sqlite"))
             {
                 connection.Open();
@@ -213,7 +310,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 {
                     while (reader.Read())
                     {
-                       rate = reader.GetString(0);
+                       rate = reader.GetInt32(0);
                         
                     }
                 }
