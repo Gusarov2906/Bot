@@ -21,6 +21,7 @@ namespace Microsoft.BotBuilderSamples.Bots
     }
     public class EchoBot : ActivityHandler
     {
+        public static string ansforEq = "";
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             string id = turnContext.Activity.From.Id;
@@ -42,7 +43,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             };
 
             bool flag = true;
-            string ansforEq = "";
+
             switch (turnContext.Activity.Text)
             {
                 case "/start":
@@ -51,9 +52,9 @@ namespace Microsoft.BotBuilderSamples.Bots
                     reply = MessageFactory.Text(id + "\t" + nickname);
                     break;
                 case "Задание":
-                    string[] equationTask = Equation.SolveEquation(3, 4);
+                    string[] equationTask = Equation.SolveEquation(2, 4);
                     ansforEq = equationTask[1];
-                    reply = MessageFactory.Text(equationTask[0] + " " + equationTask[1]);
+                    reply = MessageFactory.Text(equationTask[0]);
                     reply.SuggestedActions = new SuggestedActions()
                     {
                         Actions = new List<CardAction>()
