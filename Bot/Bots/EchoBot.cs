@@ -26,7 +26,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             string id = turnContext.Activity.From.Id;
             string nickname = turnContext.Activity.From.Name;
 
-            var reply = MessageFactory.Text("You put on the button");
+            var reply = MessageFactory.Text("");
 
 
 
@@ -41,8 +41,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                 },
             };
 
-
-
+            bool flag = true;
+            string ansforEq = "";
             switch (turnContext.Activity.Text)
             {
                 case "/start":
@@ -52,33 +52,29 @@ namespace Microsoft.BotBuilderSamples.Bots
                     break;
                 case "Задание":
                     string[] equationTask = Equation.SolveEquation(3, 4);
-                    reply = MessageFactory.Text(equationTask[0]);
-
-
+                    ansforEq = equationTask[1];
+                    reply = MessageFactory.Text(equationTask[0] + " " + equationTask[1]);
                     reply.SuggestedActions = new SuggestedActions()
                     {
                         Actions = new List<CardAction>()
                         {
-                            new CardAction() { Title = "кусь", Type = ActionTypes.ImBack, Value = "кусь"},
-                            new CardAction() { Title = equationTask[3], Type = ActionTypes.ImBack, Value = "3" },
-                            new CardAction() { Title = equationTask[4], Type = ActionTypes.ImBack, Value = "4" },
-                            new CardAction() { Title = equationTask[5], Type = ActionTypes.ImBack, Value = "5" },
+                            new CardAction() { Title = equationTask[2], Type = ActionTypes.ImBack, Value = "0"},
+                            new CardAction() { Title = equationTask[3], Type = ActionTypes.ImBack, Value = "1" },
+                            new CardAction() { Title = equationTask[4], Type = ActionTypes.ImBack, Value = "2" },
+                            new CardAction() { Title = equationTask[5], Type = ActionTypes.ImBack, Value = "3" },
                         },
                     };
 
-                    switch (turnContext.Activity.Text)
-                    {
-                        case "кусь":
-                            reply = MessageFactory.Text("Ququruza");
-                            break;
-                        default:
-                            await turnContext.SendActivityAsync(reply, cancellationToken);
-                            break;
-                    }
-                    await turnContext.SendActivityAsync(reply, cancellationToken);
-
-
-                    //await turnContext.SendActivityAsync(reply, cancellationToken);
+                    flag = false;
+                    break;
+                case "0":
+                case "1":
+                case "2":
+                case "3":
+                    if(ansforEq.Equals(turnContext.Activity.Text))
+                        reply = MessageFactory.Text("GG");
+                    else
+                        reply = MessageFactory.Text("FF");
                     break;
                 case "Факты":
                     string fact = getFact();
@@ -99,35 +95,27 @@ namespace Microsoft.BotBuilderSamples.Bots
                     }
                     reply = MessageFactory.Text(ansRate);
                     break;
-                case "5":
-                    reply = MessageFactory.Text("Приветсвую, это чат-бот, с помощью которого ты можешь подтнять свои знания по разным предметам");
-                    break;
                     
                 default:
-                    reply.SuggestedActions = new SuggestedActions()
-                    {
-                        Actions = new List<CardAction>()
-                        {
-                            new CardAction() { Title = "Задание", Type = ActionTypes.ImBack, Value = "Задание"},
-                            new CardAction() { Title = "Факты", Type = ActionTypes.ImBack, Value = "Факты" },
-                            new CardAction() { Title = "Профиль", Type = ActionTypes.ImBack, Value = "Профиль" },
-                            new CardAction() { Title = "Рейтинг", Type = ActionTypes.ImBack, Value = "Рейтинг" },
-                        },
-                    };
-                    await turnContext.SendActivityAsync(reply, cancellationToken);
+
                     break;
             }
-            //await turnContext.SendActivityAsync(reply, cancellationToken);
-            //reply.SuggestedActions = new SuggestedActions()
-            //{
-            //    Actions = new List<CardAction>()
-            //    {
-            //        new CardAction() { Title = "Задание", Type = ActionTypes.ImBack, Value = "Задание"},
-            //        new CardAction() { Title = "Факты", Type = ActionTypes.ImBack, Value = "Факты" },
-            //        new CardAction() { Title = "Профиль", Type = ActionTypes.ImBack, Value = "Профиль" },
-            //        new CardAction() { Title = "Рейтинг", Type = ActionTypes.ImBack, Value = "Рейтинг" },
-            //    },
-            //};
+
+            if (flag)
+            {
+                reply.SuggestedActions = new SuggestedActions()
+                {
+                    Actions = new List<CardAction>()
+                {
+                    new CardAction() { Title = "Задание", Type = ActionTypes.ImBack, Value = "Задание"},
+                    new CardAction() { Title = "Факты", Type = ActionTypes.ImBack, Value = "Факты" },
+                    new CardAction() { Title = "Профиль", Type = ActionTypes.ImBack, Value = "Профиль" },
+                    new CardAction() { Title = "Рейтинг", Type = ActionTypes.ImBack, Value = "Рейтинг" },
+                },
+                };
+            }
+            else
+                flag = true;
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
        
