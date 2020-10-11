@@ -29,6 +29,7 @@ namespace Microsoft.BotBuilderSamples.Bots
     {
         public static string ansforEq = "";
         public static string ansforTs = "";
+        public static string ansforEq1 = "";
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             string id = turnContext.Activity.From.Id;
@@ -51,6 +52,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             bool flag = true;
             int rate = 0;
+
             switch (turnContext.Activity.Text)
             {
                 case "/start":
@@ -63,8 +65,9 @@ namespace Microsoft.BotBuilderSamples.Bots
                     rate = getRate(id);
                     if (tempRand != 2)
                     {
-                        string[] equationTask = Equation.SolveEquation(rateToWeight(rate), 4);
+                        string[] equationTask = Equation.SolveEquation(rateToWeight(rate) + 1, 4);
                         ansforEq = equationTask[1];
+                        ansforEq1 = equationTask[Convert.ToInt32(equationTask[1]) + 2];
                         reply = MessageFactory.Text(equationTask[0]);
                         reply.SuggestedActions = new SuggestedActions()
                         {
@@ -121,13 +124,14 @@ namespace Microsoft.BotBuilderSamples.Bots
                     string ansRate = "";
                     foreach (User i in listUser)
                     {
-                        ansRate += "Имя:\t" + i.nickname + "\tРейтинг:\t" + i.rate + "\r\n";
+                        ansRate += "Имя:" + i.nickname + "\tРейтинг:" + i.rate + "\r";
                     }
                     reply = MessageFactory.Text(ansRate);
                     break;
                     
                 default:
-                    if ((turnContext.Activity.Text).Equals(ansforTs.ToString()))
+                    
+                    if ((turnContext.Activity.Text).Equals(ansforTs.ToString()) || (turnContext.Activity.Text).Equals(ansforEq1))
                     {
                         setRate(id, (getRate(id) + 100));
                         reply = MessageFactory.Text("GG");
@@ -163,7 +167,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected int rateToWeight(int rate)
         {
             if (rate > 1000)
-                return 5;
+                return 6;
             return rate / 200 + 1;
            
         }

@@ -15,10 +15,11 @@ namespace Module
         private static string GenerateTrueAns(double[] X)
         {
             string str = "";
-            for (int i = 0; i < X.Length - 1; i++)
+            for (int i = 0; i < X.Length - 1 -1; i++)
             {
-                str += X[i].ToString() + ", ";
+                str += X[i].ToString() + " ";
             }
+            str += X[X.Length - 1].ToString();
             return str;
         }
 
@@ -30,10 +31,11 @@ namespace Module
         private static string GenerateFalseAns(double[] X)
         {
             string str = "";
-            for (int i = 0; i < X.Length - 1; i++)
+            for (int i = 0; i < X.Length - 1 -1; i++)
             {
-                str += (((new Random()).Next() % 2 == 1) ? X[i] + 1 : ((new Random()).Next() % 2 == 1) ? X[i] + ((new Random()).Next() % 10 - 5) : X[i] * ((new Random()).Next() % 8 - 4)).ToString() + ", ";
+                str += (((new Random()).Next() % 2 == 1) ? X[i] + 1 : ((new Random()).Next() % 2 == 1) ? X[i] + ((new Random()).Next() % 10 - 5) : X[i] * ((new Random()).Next() % 8 - 4)).ToString() + " ";
             }
+            str += (((new Random()).Next() % 2 == 1) ? X[X.Length - 1] + 1 : ((new Random()).Next() % 2 == 1) ? X[X.Length - 1] + ((new Random()).Next() % 10 - 5) : X[X.Length - 1] * ((new Random()).Next() % 8 - 4)).ToString();
             return str;
         }
 
@@ -161,8 +163,7 @@ namespace Module
                     Y[i] = Y[i] - AX[i][k] * w[k];
             }
 
-            return (showEquation(w, X.Length - 1));
-
+            return (showEquation(w, X.Length + 1));
         }
 
         private static string showEquation(double[] w, int round)
@@ -174,12 +175,12 @@ namespace Module
             {
                 if (w[i] != 0)
                 {
-                    str += (w[1] >= 0 ? "+" : "-") + Math.Abs(Math.Round(w[i], round)).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1 - i, 1).ToString() + ")";
+                    str += (w[1] >= 0 ? " + " : " - ") + Math.Abs(Math.Round(w[i], round)).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1 - i, 1).ToString() + ")";
                 }
             }
             if (w[^1] != 0)
-                str += (w[1] >= 0 ? "+" : "-") + Math.Abs(Math.Round(w[^1], round)).ToString();
-            str += "=0";
+                str += (w[1] >= 0 ? " + " : " - ") + Math.Abs(Math.Round(w[^1], round)).ToString();
+            str += " = 0";
 
             return str;
         }
