@@ -32,7 +32,7 @@ namespace Module
             string str = "";
             for (int i = 0; i < X.Length - 1; i++)
             {
-                str += (((new Random()).Next() % 2 == 1) ? X[i] : ((new Random()).Next() % 2 == 1) ? X[i] + ((new Random()).Next() % 10 - 5) : X[i] * ((new Random()).Next() % 8 - 4)).ToString() + ", ";
+                str += (((new Random()).Next() % 2 == 1) ? X[i] + 1 : ((new Random()).Next() % 2 == 1) ? X[i] + ((new Random()).Next() % 10 - 5) : X[i] * ((new Random()).Next() % 8 - 4)).ToString() + ", ";
             }
             return str;
         }
@@ -53,14 +53,23 @@ namespace Module
                 X[i] = (new Random()).Next() % 20 - 10;
                 Y[i] = 0;
             }
-            X[dim] = (new Random()).Next() % 20 - 10;
+            X[dim] = (new Random()).Next() % 30 - 10;
             Y[dim] = (new Random()).Next() % 50 - 10;
             retStr[0] = "0";
-            /*while (retStr[0] == "0")
+            while (retStr[0] == "0")
             {
+                X = new double[dim + 1];
+                Y = new double[dim + 1];
+                for (int i = 0; i < dim; i++)
+                {
+                    X[i] = (new Random()).Next() % 20 - 10;
+                    Y[i] = 0;
+                }
+                X[dim] = (new Random()).Next() % 30 - 10;
+                Y[dim] = (new Random()).Next() % 50 - 10;
                 retStr[0] = GeneratePolinom(X, Y);
-            }*/
-            retStr[0] = GeneratePolinom(X, Y);
+            }
+
             retStr[1] = ((new Random()).Next() % (ansCount)).ToString();
             for (int i = 0; i < ansCount; i++)
             {
@@ -152,14 +161,26 @@ namespace Module
                     Y[i] = Y[i] - AX[i][k] * w[k];
             }
 
+            return (showEquation(w, X.Length - 1));
+
+        }
+
+        private static string showEquation(double[] w, int round)
+        {
             string str = "";
-            str += Math.Round(w[0], 2).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1, 1).ToString() + ")" + (w[1] >= 0 ? "+" : "-");
+            if (w[0] != 0)
+                str += Math.Round(w[0], round).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1, 1).ToString() + ")";
             for (int i = 1; i < w.Length - 1; i++)
             {
-                if (Math.Round(w[i], 1) != 0.0)
-                    str += Math.Abs(Math.Round(w[i], 2)).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1 - i, 1).ToString() + ")" + (w[i + 1] >= 0 ? "+" : "-");
+                if (w[i] != 0)
+                {
+                    str += (w[1] >= 0 ? "+" : "-") + Math.Abs(Math.Round(w[i], round)).ToString() + "(x^" + Math.Round(Convert.ToDouble(w.Length) - 1 - i, 1).ToString() + ")";
+                }
             }
-            str += Math.Abs(Math.Round(w[^1], 2)).ToString() + "=0";
+            if (w[^1] != 0)
+                str += (w[1] >= 0 ? "+" : "-") + Math.Abs(Math.Round(w[^1], round)).ToString();
+            str += "=0";
+
             return str;
         }
 

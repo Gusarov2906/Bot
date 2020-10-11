@@ -59,13 +59,13 @@ namespace Microsoft.BotBuilderSamples.Bots
                     reply = MessageFactory.Text(id + "\t" + nickname);
                     break;
                 case "Задание":
-                    int tempRand = (new Random()).Next() % 2;
+                    int tempRand = (new Random()).Next() % 3;
                     rate = getRate(id);
-                    if (tempRand == 0)
+                    if (tempRand != 2)
                     {
                         string[] equationTask = Equation.SolveEquation(rateToWeight(rate), 4);
                         ansforEq = equationTask[1];
-                        reply = MessageFactory.Text(equationTask[0] + "\t" + equationTask[1]);
+                        reply = MessageFactory.Text(equationTask[0]);
                         reply.SuggestedActions = new SuggestedActions()
                         {
                             Actions = new List<CardAction>()
@@ -81,7 +81,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     {
                         TaskStruct taskStruct = getTask(rateToWeight(getRate(id)));
                         ansforTs = taskStruct.ans;
-                        reply = MessageFactory.Text(taskStruct.text + "\t" + ansforTs);                    
+                        reply = MessageFactory.Text("Введите численный ответ(если вещественное число, то через точку)\r\n" + taskStruct.text + "\t");                    
                     }    
 
                     flag = false;
